@@ -27,7 +27,7 @@ module BPE.Base
     , Seq
     , Pair
     , Merges
-    , Vocab(Vocab)
+    , Vocab
     , textToSeq
     , maxByVal
     , invMap

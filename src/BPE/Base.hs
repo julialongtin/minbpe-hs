@@ -32,6 +32,7 @@ module BPE.Base
     , maxByVal
     , invMap
     , inf
+    , initVocab256
     , pairCount
     , mergePair
     , saveMergesAndVocab
@@ -116,10 +117,14 @@ saveMergesAndVocab path merges vocab = do
     writeFile (addExtension path "merges") (show $ Map.toList merges)
     writeFile (addExtension path "vocab") (prettifyVocab merges vocab)
 
+-- A possible initial vocabulary: the initial 256 characters.
+initVocab256 :: Vocab
+initVocab256 = Map.fromList [(id, BS.pack [fromIntegral id :: Word8]) | id <- [0..255]]
+
 -- Builds vocabulary given merges
-mergesToVocab :: Merges -> Vocab
-mergesToVocab = Map.foldlWithKey' updateVocab initVocab
-    where initVocab = Map.fromList [(id, BS.pack [fromIntegral id :: Word8]) | id <- [0..255]]
+mergesToVocab :: Merges -> Vocab -> Vocab
+mergesToVocab merges initVocab = Map.foldlWithKey' updateVocab initVocab merges
+    where
           getPair vocab id1 id2 = BS.concat $ map fromJust [Map.lookup id1 vocab, Map.lookup id2 vocab]
           updateVocab vocab (id1, id2) id = Map.insert id (getPair vocab id1 id2) vocab
 
@@ -127,4 +132,4 @@ mergesToVocab = Map.foldlWithKey' updateVocab initVocab
 loadMergesAndVocab :: FilePath -> IO (Merges, Vocab)
 loadMergesAndVocab path = do
     merges <- fmap (Map.fromList . read) (readFile path)
-    return (merges, mergesToVocab merges)
+    return (merges, mergesToVocab merges initVocab256)

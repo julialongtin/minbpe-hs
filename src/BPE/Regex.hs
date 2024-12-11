@@ -54,7 +54,7 @@ trainTokenizer vocabSize pattern = trainTokenizerHelper vocabSize merges vocab 2
                                  . map textToSeq
                                  . findAll pattern
     where merges = Map.empty
-          vocab = mergesToVocab merges
+          vocab = mergesToVocab merges initVocab256
 
 -- Recursively merges pairs with the smallest merge ID, ignoring special tokens
 encodeOrdinary :: Merges -> Pattern -> BS.ByteString -> Seq

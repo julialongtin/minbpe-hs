@@ -26,7 +26,7 @@ trainTokenizerHelper vocabSize merges vocab id seq
 trainTokenizer :: Int -> BS.ByteString -> (Merges, Vocab)
 trainTokenizer vocabSize = trainTokenizerHelper vocabSize merges vocab 256 . textToSeq
     where merges = Map.empty
-          vocab = mergesToVocab merges
+          vocab = mergesToVocab merges initVocab256
 
 -- Recursively merges pairs with the smallest merge ID
 encodeHelper :: Merges -> Seq -> Seq

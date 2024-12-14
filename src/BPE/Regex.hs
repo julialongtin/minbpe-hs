@@ -51,14 +51,14 @@ trainTokenizerHelper vocabSize merges vocab id seqList
 -- Recursively finds the most frequent pair, merges it, and updates the merges & vocabulary
 trainTokenizer :: Int -> Pattern -> BS.ByteString -> (Merges, Vocab)
 trainTokenizer vocabSize pattern = trainTokenizerHelper vocabSize merges vocab 256
-                                 . map textToSeq
+                                 . map initSeq256
                                  . findAll pattern
     where merges = Map.empty
           vocab = mergesToVocab merges initVocab256
 
 -- Recursively merges pairs with the smallest merge ID, ignoring special tokens
 encodeOrdinary :: Merges -> Pattern -> BS.ByteString -> Seq
-encodeOrdinary merges pattern = concat . map (BPE.Basic.encode merges) . findAll pattern
+encodeOrdinary merges pattern = concat . map (BPE.Basic.encode initVocab256 merges initSeq256 ) . findAll pattern
 
 -- Recursively merges pairs with the smallest merge ID, raising an error for special tokens
 encode :: Merges -> Pattern -> SpecialTokens -> BS.ByteString -> Seq

@@ -24,7 +24,7 @@ trainTokenizerHelper vocabSize merges vocab id seq
 
 -- Recursively finds the most frequent pair, merges it, and updates the merges & vocabulary
 trainTokenizer :: Int -> BS.ByteString -> (Merges, Vocab)
-trainTokenizer vocabSize = trainTokenizerHelper vocabSize merges vocab 256 . textToSeq
+trainTokenizer vocabSize = trainTokenizerHelper vocabSize merges vocab 256 . initSeq256
     where merges = Map.empty
           vocab = mergesToVocab merges initVocab256
 
@@ -41,8 +41,8 @@ encodeHelper merges seq
           merged = mergePair pairToMerge (fromJust $ Map.lookup pairToMerge merges) seq
 
 -- Recursively merges pairs with the smallest merge ID
-encode :: Merges -> BS.ByteString -> Seq
-encode merges = encodeHelper merges . textToSeq
+encode :: Vocab -> Merges -> (BS.ByteString -> Seq) -> BS.ByteString -> Seq
+encode initVocab merges initSeq text = encodeHelper merges (initSeq text)
 
 -- Decodes the input into a string using vocabulary look-up
 decode :: Vocab -> Seq -> BS.ByteString

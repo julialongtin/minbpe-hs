@@ -28,10 +28,10 @@ module BPE.Base
     , Pair
     , Merges
     , Vocab
-    , textToSeq
     , maxByVal
     , invMap
     , inf
+    , initSeq256
     , initVocab256
     , pairCount
     , mergePair
@@ -58,10 +58,6 @@ type Seq = [Id]
 type Pair = (Id, Id)
 type Merges = InsOrdHashMap Pair Id
 type Vocab = InsOrdHashMap Id BS.ByteString
-
--- Converts a text to a list of integral byte values
-textToSeq :: BS.ByteString -> Seq
-textToSeq = map fromIntegral . BS.unpack
 
 -- Finds the key in an ordered map with the maximum value
 maxByVal :: (Eq k, Hashable k, Ord v) => InsOrdHashMap k v -> k
@@ -117,9 +113,13 @@ saveMergesAndVocab path merges vocab = do
     writeFile (addExtension path "merges") (show $ Map.toList merges)
     writeFile (addExtension path "vocab") (prettifyVocab merges vocab)
 
--- A possible initial vocabulary: the initial 256 characters.
+-- An initial vocabulary: the initial 256 characters.
 initVocab256 :: Vocab
 initVocab256 = Map.fromList [(id, BS.pack [fromIntegral id :: Word8]) | id <- [0..255]]
+
+-- Converts a text to a list of integral byte values, coresponding to initVocab256.
+initSeq256 :: BS.ByteString -> Seq
+initSeq256 text = fromIntegral <$> BS.unpack text
 
 -- Builds vocabulary given merges
 mergesToVocab :: Merges -> Vocab -> Vocab

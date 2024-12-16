@@ -81,13 +81,13 @@ trainTokenizer vocabSize pattern = trainTokenizerHelper vocabSize merges vocab 2
           vocab = mergesToVocab merges initVocab256
 
 -- Recursively merges pairs with the smallest merge ID, ignoring special tokens
-encodeOrdinary :: Merges -> Pattern -> BS.ByteString -> Seq
-encodeOrdinary merges pattern = concat . map (BPE.Basic.encode initVocab256 merges initSeq256 ) . findAll pattern
+encodeOrdinary :: Vocab -> (BS.ByteString -> Seq) -> Merges -> Pattern -> BS.ByteString -> Seq
+encodeOrdinary initVocab initSeq merges pattern = concat . map (BPE.Basic.encode initVocab merges initSeq ) . findAll pattern
 
 -- Recursively merges pairs with the smallest merge ID, raising an error for special tokens
-encode :: Merges -> Pattern -> SpecialTokens -> BS.ByteString -> Seq
-encode merges pattern specialTokens text
-    | noSpecial = encodeOrdinary merges pattern text
+encode :: Vocab -> (BS.ByteString -> Seq) -> Merges -> Pattern -> SpecialTokens -> BS.ByteString -> Seq
+encode initVocab initSeq merges pattern specialTokens text
+    | noSpecial = encodeOrdinary initVocab initSeq merges pattern text
     | otherwise = error "Input cannot contain special tokens."
     where noSpecial = all (\special -> not $ text =~ special) (Map.keys specialTokens)
 

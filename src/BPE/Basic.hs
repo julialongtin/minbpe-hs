@@ -65,8 +65,8 @@ encodeHelper merges seq
           merged = mergePair pairToMerge (fromJust $ Map.lookup pairToMerge merges) seq
 
 -- Recursively merges pairs with the smallest merge ID
-encode :: Vocab -> Merges -> (BS.ByteString -> Seq) -> BS.ByteString -> Seq
-encode initVocab merges initSeq text = encodeHelper merges (initSeq text)
+encode :: (BS.ByteString -> Seq) -> Merges -> BS.ByteString -> Seq
+encode initSeq merges text = encodeHelper merges (initSeq text)
 
 -- Decodes the input into a string using vocabulary look-up
 decode :: Vocab -> Seq -> BS.ByteString

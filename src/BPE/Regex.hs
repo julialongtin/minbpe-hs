@@ -85,8 +85,8 @@ encodeOrdinary :: (BS.ByteString -> Seq) -> Merges -> Pattern -> BS.ByteString -
 encodeOrdinary initSeq merges pattern = concat . map (BPE.Basic.encode initSeq merges ) . findAll pattern
 
 -- Recursively merges pairs with the smallest merge ID, raising an error for special tokens
-encode :: Vocab -> (BS.ByteString -> Seq) -> Merges -> Pattern -> SpecialTokens -> BS.ByteString -> Seq
-encode initVocab initSeq merges pattern specialTokens text
+encode :: (BS.ByteString -> Seq) -> Merges -> Pattern -> SpecialTokens -> BS.ByteString -> Seq
+encode initSeq merges pattern specialTokens text
     | noSpecial = encodeOrdinary initSeq merges pattern text
     | otherwise = error "Input cannot contain special tokens."
     where noSpecial = all (\special -> not $ text =~ special) (Map.keys specialTokens)
